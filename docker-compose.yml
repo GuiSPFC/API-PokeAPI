@@ -1,15 +1,11 @@
 version: '3.13'
 
-web:
+services:
+  web:
     build: .
-    container_name: pokemon_api
     ports:
       - "8000:8000"
-    environment:
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
     volumes:
       - .:/app
-    depends_on:
-      - redis
-    restart: always
+    environment:
+      - PYTHONUNBUFFERED=1
