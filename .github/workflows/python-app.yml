@@ -1,0 +1,26 @@
+name: CI/CD Pipeline - Docker
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  test-docker:
+    runs-on: ubuntu-latest
+
+    steps:
+    
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Build and run services
+      run: docker compose up --build -d
+      
+    - name: Run tests inside container
+      run: docker compose exec -T web poetry run pytest test_poke.py
+
+    - name: Stop services
+      if: always()
+      run: docker compose down
