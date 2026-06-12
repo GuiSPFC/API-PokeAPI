@@ -32,9 +32,7 @@ A forma recomendada para executar esta aplicação é utilizando contêineres Do
 
 A documentação interativa baseada na especificação OpenAPI é gerada de forma 100% automática pelo FastAPI. Com a aplicação rodando, acesse os endereços abaixo no seu navegador:
 
-*   **Interface Interativa (Swagger UI):** [http://127.0.0](http://127.0.0)
-*   **Interface Alternativa (Redoc):** [http://127.0.0](http://127.0.0)
-
+*   **Interface Interativa (Swagger UI):** https://api-pokeapi.onrender.com/docs#/
 ---
 
 ## Endpoints Disponíveis
