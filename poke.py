@@ -6,16 +6,21 @@ import os
 import httpx
 from pydantic import BaseModel, Field
 from typing import List
+from dotenv import load_dotenv
+
+load_dotenv()
+
+database_url = os.getenv("DATABASE_URL","sqlite:///./atividadeawait.db")
+API_VERSION = os.getenv("API_VERSION", "1.0.0")
 
 app = FastAPI(
     title="Projeto API",
     description="API assíncrona para buscar Pokemons da POKEAPI",
-    version="1.0.0"
+    version=API_VERSION
 )
 
 base = declarative_base()
 
-database_url = "sqlite:///./atividadeawait.db"
 engine = create_engine(database_url, connect_args={"check_same_thread":False})
 SessionLocal = sessionmaker(autocommit = False, autoflush = False, bind = engine)
 
@@ -47,6 +52,12 @@ class PokemonRespostaSwagger(BaseModel):
 
     class Config:
         from_attributes = True
+
+class Atualizar_Pokemons(BaseModel):
+    nome_pokemon: str = Field(..., example= "pikachu modificado")
+    altura_pokemon: int = Field(..., example= 5)
+    peso_pokemon: int = Field(..., example= 65)
+    tipo_pokemon: str = Field(..., example="electric, steel")
 
 class ListaPokemons(BaseModel):
     Pagina: int = Field(..., example=1)
@@ -153,3 +164,30 @@ async def get_pokemons_id(id: int = Path(..., description="ID do Pokémon buscad
     
     return pokemon
 
+@app.put("/Pokemons/{id}")
+async def put_pokemons(id:int,pokemons_input: Atualizar_Pokemons, db: Session = Depends(sessao_db)):
+    pokemon = db.query(PokemonDB).filter(PokemonDB.id == id).first()
+    if not pokemon:
+        raise HTTPException(status_code=404, detail="Pokemon não encontrado")
+    
+    pokemon.nome_pokemon = pokemons_input.nome_pokemon
+    pokemon.altura_pokemon = pokemons_input.altura_pokemon
+    pokemon.peso_pokemon = pokemons_input.peso_pokemon
+    pokemon.tipo_pokemon = pokemons_input.tipo_pokemon
+
+    db.commit()
+    db.refresh(pokemon)
+
+    return {"message": "Dados do Pokemon Atualizado"}
+
+@app.delete("/Pokemons/{id}")
+async def delete_pokemons(id: int, db: Session = Depends(sessao_db)):
+    pokemon = db.query(PokemonDB).filter(PokemonDB.id == id).first()
+
+    if not pokemon:
+        raise HTTPException(status_code=404, detail="Pokemon não encontrado")
+    
+    db.delete(pokemon)
+    db.commit()
+
+    return{"message": "Pokemon deletado"}

@@ -1,0 +1,11 @@
+.env
+AULAS/
+meu-projeto-fastapi/
+*.yaml
+*.db
+Untitled-1.py
+Aulagit.py
+classes.py
+calculadora2.py
+calculadora.py
+sistemaestoque.py

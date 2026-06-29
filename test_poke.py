@@ -121,3 +121,53 @@ def test_buscar_por_id_nao_encontrado():
     resposta = client.get("/Pokemons/999")
     assert resposta.status_code == 404
     assert resposta.json()["detail"] == "Pokemon não encontrado"
+
+#TESTE DE ATUALIZAR POKEMON COM SUCESSO
+
+def test_atualizar_pokemon_sucesso():
+    db = TestingSessionLocal()
+    pkm = PokemonDB(id=25, nome_pokemon="pikachu", altura_pokemon=4, peso_pokemon=60, tipo_pokemon="electric", sprites_pokemon="url")
+    db.add(pkm)
+    db.commit()
+
+    dados_atualizados = {
+        "nome_pokemon": "pikachu modificado",
+        "altura_pokemon": 5,
+        "peso_pokemon": 65,
+        "tipo_pokemon": "electric, steel"
+    }
+
+    resposta = client.put("/Pokemons/25", json=dados_atualizados)
+    assert resposta.status_code == 200
+    assert resposta.json()["message"] == "Dados do Pokemon Atualizado"
+
+#TESTE DE ATUALIZAR POKEMON COM ERRO
+
+def test_atualizar_pokemon_nao_encontrado():
+    dados_atualizados = {
+        "nome_pokemon": "Ronaldo",
+        "altura_pokemon": 1,
+        "peso_pokemon": 1,
+        "tipo_pokemon": "normal"
+    }
+    resposta = client.put("/Pokemons/999", json=dados_atualizados)
+    assert resposta.status_code == 404
+    assert resposta.json()["detail"] == "Pokemon não encontrado"
+
+
+#TESTES DO ENDPOINT DELETE
+
+def test_deletar_pokemon_sucesso():
+    db = TestingSessionLocal()
+    pkm = PokemonDB(id=4, nome_pokemon="charmander", altura_pokemon=6, peso_pokemon=85, tipo_pokemon="fire", sprites_pokemon="url")
+    db.add(pkm)
+    db.commit()
+
+    resposta = client.delete("/Pokemons/4")
+    assert resposta.status_code == 200
+    assert resposta.json()["message"] == "Pokemon deletado"
+
+def test_deletar_pokemon_nao_encontrado():
+    resposta = client.delete("/Pokemons/999")
+    assert resposta.status_code == 404
+    assert resposta.json()["detail"] == "Pokemon não encontrado"
